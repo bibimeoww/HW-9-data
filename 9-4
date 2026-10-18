@@ -1,0 +1,208 @@
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+
+@SuppressWarnings("unchecked")
+public class HashGraph extends Graph {
+    
+    int p; // Big Prime (for PolyHash())
+    int x; // Small number (for PolyHash())
+    
+    // This is complete, no need to edit
+    public HashGraph(int cap, int p, int x){
+        super(cap); // Forward the parameter to Graph's constructor
+        this.p = p;
+        this.x = x;
+    }
+    
+    public static int polyHash(String s, int p, int x){
+        long hash = 0; 
+        // Horner's Method จากท้ายมาหน้า
+        for (int i = s.length() - 1; i >= 0; i--) {
+            hash = (hash * x + s.charAt(i)) % p;
+        }
+        return (int) hash;
+    }
+    
+    public int getListIndex(String s){
+        int originalIndex = polyHash(s, p, x) % cap;
+        int index = originalIndex;
+        int i = 1;
+        
+        // ค้นหาตำแหน่งว่าง หรือตำแหน่งที่เป็นของ String s อยู่แล้ว)
+        while (vertexList[index] != null) {
+            if (vertexList[index].strKey.equals(s)) {
+                return index;
+            }
+            index = (index + i) % cap; 
+            i++;
+        }
+        return index;
+    }
+    
+    public void addVertex(String key){
+        if (size == cap){
+            System.out.println("Vertex list is full. You need to recreate the Graph");
+            return;
+        }
+        
+        // หา Index ผ่านฟังก์ชัน getListIndex
+        int index = getListIndex(key);
+        
+        // หากช่องนั้นยังว่างอยู่ ให้สร้าง Vertex ใหม่และ LinkedList มารองรับ
+        if (vertexList[index] == null) {
+            vertexList[index] = new Vertex(key); // สมมติว่าคลาส Vertex รองรับ Constructor(String)
+            adjacencyList[index] = new LinkedList<>();
+            size++;
+        }
+    }
+    
+    public void addEdge(String source, String destination){
+        // แปลงชื่อเมืองให้เป็นเลข Index ในอาร์เรย์
+        int u = getListIndex(source);
+        int v = getListIndex(destination);
+        
+        // เรียกใช้งานฟังก์ชัน addEdge ดั้งเดิมจากคลาสแม่ (Graph)
+        super.addEdge(u, v);
+    }
+    
+
+    public void BFS(Vertex s){
+        for (int i = 0; i < cap; i++) {
+            if (vertexList[i] != null) {
+                vertexList[i].dist = Integer.MAX_VALUE;
+                vertexList[i].prev = null;
+            }
+        }
+        
+        // Set dist of the start vertex (s) to 0
+        s.dist = 0;
+        
+        // Push the start vertex to an empty queue
+        Queue<Vertex> q = new LinkedList<>();
+        q.add(s);
+        
+        // Check if the queue is not empty
+        while (!q.isEmpty()) {
+            // Pop the queue, and get the current vertex
+            Vertex curr = q.remove();
+            
+            // Extract the list of all vertices that are connected to current vertex
+            int u = getListIndex(curr.strKey);
+            LinkedList<Integer> neighbors = adjacencyList[u];
+            
+            // Traverse all the list, and check if the dist value of anyone are still infinity or not
+            for (int neighbor_index : neighbors) {
+                Vertex neighbor = vertexList[neighbor_index];
+                
+                if (neighbor.dist == Integer.MAX_VALUE) {
+                    // If yes, push that vertex into the queue
+                    q.add(neighbor);
+                    // increase the dist variable of that vertex by one
+                    neighbor.dist = curr.dist + 1;
+                    // set the prev variable of that vertex to the current vertex
+                    neighbor.prev = curr;
+                }
+            }
+        }
+    }
+
+    
+    public Stack<Vertex> getShortestPathList(Vertex S, Vertex U){
+        // Create a stack
+        Stack<Vertex> stack = new Stack<>();
+        
+        // Start from city U
+        Vertex current = U;
+        
+        while (current != null) {
+            // push the current city into the stack
+            stack.push(current);
+            
+            // Stop loop when reaching the starting city
+            if (current == S) {
+                break;
+            }
+            
+            // Go back one city using U.prev
+            current = current.prev;
+        }
+        
+        // return the stack
+        return stack; 
+    }
+    
+    public void printShortestPath(String s_str, String u_str){
+        // Map city names to index numbers
+        int s_index = getListIndex(s_str);
+        int u_index = getListIndex(u_str);
+        
+        // Get vertices from the vertexList
+        Vertex S = vertexList[s_index];
+        Vertex U = vertexList[u_index];
+        
+        // Run BFS() at the starting city
+        BFS(S);
+        
+        // Get shortestPathList(starting city, ending city)
+        Stack<Vertex> pathStack = getShortestPathList(S, U);
+        
+        // Traverse all the stack and print the city name
+        while (!pathStack.isEmpty()) {
+            Vertex v = pathStack.pop();
+            System.out.print(v.strKey + " -> ");
+        }
+        System.out.println();
+    }
+    // This function is complete, no need to edit
+    public void showVertexList(){
+        for (int i=0; i<vertexList.length; i++){
+            if (vertexList[i]!=null)
+                System.out.println("vertexList["+i+"] contains "+vertexList[i].strKey);
+            else
+                System.out.println("vertexList["+i+"] null");
+        }
+    }
+    
+    // This is editable test case, but no need to edit
+    public static HashGraph constructGraph(){
+        
+        int p = 101111; // Big Prime (Hash key1)
+        int x = 101;    // Small number (Hash key2)
+        HashGraph graph = new HashGraph(32, p, x); 
+        
+        String[] cities = new String[]{"Dublin", "Edinburgh", "Manchester", 
+            "Copenhagen", "Lisbon", "London", "Berlin", "Prague", "Madrid", 
+            "Paris", "Vienna", "Budapest", "Geneva", "Milan", "Zurich", "Rome"};
+        for (int i=0; i<16; i++){
+            graph.addVertex(cities[i]);
+        }
+        
+        return graph;
+    }
+    
+    // This is editable test case, but no need to edit
+    public static HashGraph connectEdges(HashGraph graph){
+        graph.addEdge("Dublin", "Edinburgh");
+        graph.addEdge("Dublin", "London");                
+        graph.addEdge("Dublin", "Lisbon");
+        graph.addEdge("Edinburgh", "Manchester");
+        graph.addEdge("Manchester", "London");
+        graph.addEdge("Manchester", "Copenhagen");
+        graph.addEdge("Copenhagen", "Berlin");
+        graph.addEdge("Lisbon", "Madrid");
+        graph.addEdge("London", "Paris");
+        graph.addEdge("Berlin", "Prague");
+        graph.addEdge("Berlin", "Vienna");
+        graph.addEdge("Berlin", "Paris");
+        graph.addEdge("Prague", "Zurich");
+        graph.addEdge("Madrid", "Paris");
+        graph.addEdge("Madrid", "Milan");
+        graph.addEdge("Madrid", "Geneva");
+        graph.addEdge("Vienna", "Zurich");
+        graph.addEdge("Budapest", "Rome");
+        graph.addEdge("Milan", "Zurich");
+        graph.addEdge("Zurich", "Rome");
+        return graph;
+    }
+}
