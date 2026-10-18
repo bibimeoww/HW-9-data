@@ -1,0 +1,88 @@
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+
+@SuppressWarnings("unchecked")
+public class JavaCollectionTest {
+
+    public static void linkedlistTest() {
+        LinkedList<Integer> list = new LinkedList<>();
+        //สร้าง linklist ชื่อ list เพื่อเก็บเฉพาะเลขจำนวนเต็ม
+        
+        int x;
+        for (int i = 1; i < 10; i += 2) {
+            x = i;
+            list.add(x);
+        }
+        // ประกาศตัวแปร x เพื่อเก็บตัวเลข สร้างลูปแล้วนำค่าจากลูปมาเก็บที่x แล้วนำเลขนั้นไปต่อท้ายใน list
+        boolean check = list.contains(5);
+        System.out.println("5 is in the list = " + check);
+        //เช็คว่าใน list มีเลข 5 ไหม ถ้ามีคืนค่า true ถ้าไม่มีคืนค่า false แล้วเก็บลงในตัวแปร check
+        check = list.contains(6); 
+        System.out.println("6 is in the list = " + check);
+        //แสดงผลลัพธ์ของตัวแปร check 
+        for (int e : list) { //ใช้ loop for - each วิ่งดึงข้อมูลออกจาก list ทีละตัวแล้วเอามาเก็บไว้ที่ e
+            System.out.print(e + ", "); //พิมพ์ค่า e ออกมา
+        }
+        System.out.println();
+    }
+        
+    public static void queueTest() {
+        Queue<String> q = new LinkedList<>(); //สร้างคิวชื่อ q เพื่อเก็บ string โดยใช้ linklist ในการสร้างโครงสร้าง
+        
+        String[] names = {"Abraham", "Andrew", "Benjamin", "Claudia", "Gabriel"};
+        for (int i = 0; i < names.length; i++) {
+            q.add(names[i]); //นำรายชื่อเข้าคิวไปต่อท้ายกันเรื่อย ๆ 
+        }
+            
+        System.out.println("Top = " + q.peek());        // .peek() ใช้เช็คว่าใครอยู่คิวแรกสุด โดยไม่ได้ดึงคนๆ นั้นออกจากคิว
+        System.out.println("1st Pop = " + q.poll());    // .poll() ดึงคนแรกสึดออกจากคิวตามหลัก first in - first out แล้วพิมพ์ชื่อคนนั้น
+        System.out.println("2nd Pop = " + q.poll());    // ลำดับถัดจากลำดับแรกออกจากคิว
+        System.out.println("3rd Pop = " + q.poll());    // ลำดับถัดไปออกจากคิว
+    }
+        
+    public static void stackTest() { //ทดสอบ stack
+        Stack<String> s = new Stack<>(); //สร้างสแต็ก s สำหรับเก็บ string
+        
+        String[] names = {"Abraham", "Andrew", "Benjamin", "Claudia", "Gabriel"}; //สร้าง arrเก็บรายชื่อ
+        for (int i = 0; i < names.length; i++) { //วนลูปตามรายชื่อ
+            s.push(names[i]); //ใช้ .push เพื่อดันรายชื่อใส่ลงไปในสแต็ก ซ้อนกันไปเรื่อยๆ
+        }
+            
+        System.out.println("Top = " + s.peek());        // .peek() เพื่อดูว่าใครอยู่บนสุดของสแต็ก ซึ่งเท่ากับคนล่าสุดที่เพิ่งถูกใส่เข้ามา
+        System.out.println("1st Pop = " + s.pop());     // ดึงข้อมูลตัวบนสุดออกจากสแต็ก (มาหลังสุดออกก่อน) แล้วพิมพ์ชื่อนั้น
+        System.out.println("2nd Pop = " + s.pop());     // ดึงตัวบนสุดถัดไปออก
+        System.out.println("3rd Pop = " + s.pop());     // ดึงตัวบนสุดถัดไปออก
+    }
+        
+        
+    public static void arrayOfListTest() {
+        LinkedList<String>[] arr = new LinkedList[5]; //สร้าง arr ที่เก็บ linklist ไว้ข้างในได้ 5 ช่อง
+        
+        
+        String[] names = {"Abraham", "Andrew", "Benjamin", "Claudia", "Gabriel"};
+        for (int i = 0; i < 5; i++) { //ลูปชั้นนอก ทำงาน 5 รอบ สำหรับ arr 5 ช่อง
+            LinkedList<String> list = new LinkedList<>(); 
+            for (int j = 0; j <= i; j++) { //ลูปชั้นในไว้สำหรับเติมชื่อใส่ในลิสต์
+                list.add(names[j]); //นำชื่อใส่ในลิสต์
+            }
+            arr[i] = list; //นำลิสต์ที่เติมชื่อแล้วไปเก็บไว้ที่ arr ช่องที่ i
+        }
+
+        for (int i = 0; i < arr.length; i++) {
+            
+            System.out.print("arr[" + i + "] = ");
+            for (String s : arr[i]) {
+                System.out.print(s + ", ");
+            }
+            System.out.println("");
+        }
+            
+        for (int i = 0; i < arr.length; i++) {
+            
+            boolean hasBenjamin = arr[i].contains("Benjamin"); //ใช้ตรวจสอบว่าใน arr[i]มีชื่อนี้อยู่ไหม แล้วนำผลลัพธ์ true/false ไปเก็บที่ hasBenjamin
+            
+            System.out.println("Benjamin is contained in arr[" + i + "]? = " + hasBenjamin); // Fix this
+        }
+    }
+}
