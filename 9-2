@@ -1,0 +1,91 @@
+public class HashTable {
+    String[] arr;
+    int size;
+    int capacity;
+    
+    // Hashing parameters
+    int p; // Big Prime (for PolyHash())
+    int x; // Small number (for PolyHash())
+    
+    public HashTable(int cap, int p, int x){
+        arr = new String[cap];
+        this.capacity = cap;
+        this.p = p;
+        this.x = x;
+    }
+    
+    public void addString(String s){
+        int index = getIndex(s); //หาตำแหน่งที่เหมาะสม
+        if (arr[index] == null) { //ถ้าช่องนั้นว่าง ให้เก็บ string s ลงไป แล้วก็เพิ่ม size
+            arr[index] = s;
+            size++;
+        }
+    }
+   
+   
+    public int getIndex(String s){
+        //นำ string ไป hash แล้วก็แปลงให้เป็น index
+        int originalIndex = polyHash(s, p, x) % capacity;
+        int index = originalIndex;
+        int i = 1;
+        
+        while (arr[index] != null){
+            // ถ้าข้อมูลในช่องนั้นคือ String ตัวเดียวกัน ให้คืนค่า Index นั้นได้เลย
+            if (arr[index].equals(s)){
+                return index;
+            }
+            // ขยับตำแหน่งหาช่องว่าง
+            index = (index + i) % capacity;
+            i++;
+        }
+        return index;
+    }
+    
+    
+    public static int polyHash(String s, int p, int x){
+        int hash = 0;
+        //คำนวณหาค่า hash โดยวนจากข้างหลังมาข้างหน้า
+        for (int i = s.length() - 1; i >= 0; i--){
+            hash = (hash * x + s.charAt(i)) % p;
+        }
+        
+        return hash;
+    }
+    
+    // This is editable testcase, no need to edit
+    public static void test1(){
+        int p = 1100101;    // Big Prime    (Hash key1)
+        int x = 1001;       // Small number (Hash key2)
+        HashTable table = new HashTable(16, p, x);
+        String[] names = {"a", "b", "c", "A", "B", "BA", "BBA", "aaa", "aaaaa", "0","1","11","111", "abcdABCD01234" };
+        for (int i=0; i<names.length; i++)
+            System.out.println("HashCode of '" + names[i] + "' is "+HashTable.polyHash(names[i], p, x));
+    }
+    
+    // This is editable testcase, no need to edit
+    public static void test2(){
+        int p = 1100101;    // Big Prime    (Hash key1)
+        int x = 1001;       // Small number (Hash key2)
+        HashTable table = new HashTable(16, p, x);
+        String[] names = {"a", "b", "c", "A", "B", "BA", "BBA", "aaa", "aaaaa", "0","1","11","111", "abcdABCD01234" };
+
+        for (int i=0; i<names.length; i++){
+            table.addString(names[i]);
+            System.out.println("Index of '" + names[i] + "' is "+table.getIndex(names[i]));
+        }
+    }
+    
+    public static void test3(){
+        int p = 1100101;   // Big Prime    (Hash key1)
+        int x = 101;       // Small number (Hash key2)
+        HashTable table = new HashTable(16, p, x);
+        String[] names = { "Abraham","Andrew","Benjamin","Claudia","Gabriel","Esther","Martha","Rebecca","Moses","Timothy"};
+        for (int i=0; i<names.length; i++)
+            System.out.println("HashCode of " + names[i] + " is "+HashTable.polyHash(names[i], p, x));
+        
+        for (int i=0; i<names.length; i++){
+            table.addString(names[i]);
+            System.out.println("Index of " + names[i] + " is "+table.getIndex(names[i]));
+        }
+    }
+}
